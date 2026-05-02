@@ -135,24 +135,36 @@
             }
         }
 
-        async function login() {
-            const name = document.getElementById('userName').value;
-            const key = document.getElementById('activationKey').value;
+async function login() {
+    const name = document.getElementById('userName').value.trim();
+    const key = document.getElementById('activationKey').value.trim();
 
-            try {
-                const doc = await db.collection("settings").doc("config").get();
-                const serverKey = doc.data().activation_key;
+    if (!name || !key) return alert("Заполни поля!");
 
-                if (key === serverKey) {
-                    localStorage.setItem('chat_user', name);
-                    showChat();
-                } else {
-                    alert("Неверный ключ!");
-                }
-            } catch (e) {
-                alert("Ошибка доступа к базе.");
-            }
+    try {
+        // --- ШАГ 1: ПРОВЕРКА БАНА ---
+        const banDoc = await db.collection("banned").doc(name).get();
+        if (banDoc.exists) {
+            alert("Твой ник заблокирован администратором!");
+            return; // Выходим и не пускаем в чат
         }
+
+        // --- ШАГ 2: ПРОВЕРКА КЛЮЧА (твой старый код) ---
+        const configDoc = await db.collection("settings").doc("config").get();
+        const serverKey = configDoc.data().activation_key;
+
+        if (key === serverKey) {
+            localStorage.setItem('chat_user_name', name);
+            currentUser = name;
+            showChat();
+        } else {
+            alert("Неверный ключ!");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Ошибка связи с базой.");
+    }
+}
 
         function showChat() {
             document.getElementById('auth-screen').style.display = 'none';
