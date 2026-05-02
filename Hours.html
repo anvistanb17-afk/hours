@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Точные часы</title>
+    <style>
+        body {
+            background-color: #0f0f0f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ff00;
+        }
+
+        .clock-container {
+            text-align: center;
+            border: 2px solid #00ff00;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+
+        #clock {
+            font-size: 80px;
+            font-weight: bold;
+        }
+
+        #ms {
+            font-size: 40px;
+            opacity: 0.7;
+        }
+
+        .date {
+            font-size: 24px;
+            margin-top: 10px;
+            color: #008800;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="clock-container">
+        <div id="clock">00:00:00<span id="ms">.000</span></div>
+        <div class="date" id="date">--.--.----</div>
+    </div>
+
+    <script>
+        const clockElement = document.getElementById('clock');
+        const msElement = document.getElementById('ms');
+        const dateElement = document.getElementById('date');
+
+        function updateClock() {
+            const now = new Date();
+
+            // Получаем компоненты времени
+            let hours = String(now.getHours()).padStart(2, '0');
+            let minutes = String(now.getMinutes()).padStart(2, '0');
+            let seconds = String(now.getSeconds()).padStart(2, '0');
+            let ms = String(now.getMilliseconds()).padStart(3, '0');
+
+            // Получаем дату
+            let day = String(now.getDate()).padStart(2, '0');
+            let month = String(now.getMonth() + 1).padStart(2, '0');
+            let year = now.getFullYear();
+
+            // Обновляем текст в элементах
+            // Выводим часы, минуты и секунды отдельно от миллисекунд
+            clockElement.childNodes[0].nodeValue = `${hours}:${minutes}:${seconds}`;
+            msElement.innerText = `.${ms}`;
+            dateElement.innerText = `${day}.${month}.${year}`;
+
+            // Зацикливаем функцию через анимационный кадр (высокая точность)
+            requestAnimationFrame(updateClock);
+        }
+
+        // Запускаем часы
+        requestAnimationFrame(updateClock);
+    </script>
+</body>
+</html>
